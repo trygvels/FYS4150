@@ -157,16 +157,16 @@ void jacobiRotation(arma::mat &A, arma::mat &R, int &k, int &l, int n) {
 
 }
 
-ofstream ofile;
 void output(double rho_max , double rho_min, int n, arma::mat &R, double Omega_r,int lowestvalueindex){
-  ofile.open("dataproj2e.txt");
-  ofile <<"Omega_r = " << setw(15) << setprecision(8) << Omega_r << endl;
-  ofile <<"rho_min = " << setw(15) << setprecision(8) << rho_min << endl;
-  ofile <<"rho_max = " << setw(15) << setprecision(8) << rho_max << endl;
-  ofile <<"Number of steps = " << setw(15) << n << endl;
+  ofstream ofile;
+  ofile.open("dataNoint.txt");
+  ofile <<"Omega_r " << setw(15) << setprecision(8) << Omega_r << endl;
+  ofile <<"rho_min " << setw(15) << setprecision(8) << rho_min << endl;
+  ofile <<"rho_max " << setw(15) << setprecision(8) << rho_max << endl;
+  ofile <<"n  " << setw(20) << n << endl;
   ofile << "Eigenvector corresponding to lowest eigenvalue:" << endl;
   for (int i = 0; i < n; i++) {
-          ofile << R(lowestvalueindex,i) << endl;
+          ofile << R(i,lowestvalueindex) << endl;
       }
       ofile <<endl;
 
@@ -179,10 +179,10 @@ void jacobiMethod(arma::mat &A, arma::mat &R, int n) {
     double rho_max = 5.0;
 
     // If it is interacting then true
-    bool interacting = true;
+    bool interacting = false;
 
     //Choosing angular freq
-    double Omega_r = 0.01;
+    double Omega_r = 1;
 
     // Constructing matrix A
     A = constructA(rho_min, rho_max,n,interacting,Omega_r);
