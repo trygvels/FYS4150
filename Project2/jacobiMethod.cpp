@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 #include <armadillo>
+#include <vector>
+#include <assert.h>
 
 using namespace std;
 
@@ -27,7 +29,7 @@ double maxOffDiagonals(arma::mat &A, int &k, int &l, int n) {
 
     }
 
-    cout << "Largest off-diagonal element is: " << max << endl;
+    //cout << "Largest off-diagonal element is: " << max << endl;
 
     return max;
 }
@@ -102,7 +104,7 @@ void jacobiRotation(arma::mat &A, arma::mat &R, int &k, int &l, int n) {
             double a_il = A(i, l);
             A(i, k) = a_ik*c - a_il*s; // 2)
             A(k, i) = A(i, k); // Symmetric matrix
-            A(i, l) = a_il*c - a_ik*s; // 3)
+            A(i, l) = a_il*c + a_ik*s; // 3)
             A(l, i) = A(i, l);
         }
 
@@ -114,11 +116,10 @@ void jacobiRotation(arma::mat &A, arma::mat &R, int &k, int &l, int n) {
     }
 }
 
-
 void jacobiMethod(arma::mat &A, arma::mat &R, int n) {
 
     // Tolerance for the non-diagonals
-    double eps = 1.0E-8;
+    double eps = 1.0e-10;
 
     // Defining maximum number of iterations
     int maxiter=n*n*n;
@@ -130,12 +131,108 @@ void jacobiMethod(arma::mat &A, arma::mat &R, int n) {
     while (max_nondiagonal > eps && iterations <=maxiter ) {
         jacobiRotation(A, R, k, l, n);
 
-        cout << "With max diagonal: "<< max_nondiagonal << endl;
-        cout << "A" << endl;
-        cout << A << endl;
-        cout << "R" << endl;
-        cout << R << endl;
+
+//        cout << "With max diagonal: "<< max_nondiagonal << endl;
+//        cout << "A" << endl;
+//        cout << A << endl;
+//        cout << "R" << endl;
+//        cout << R << endl;
+
         max_nondiagonal = maxOffDiagonals(A, k, l, n);
         iterations++;
     }
+
+    //sorting eigenvalues and printing
+    arma::vec lambda = A.diag();
+    lambda=sort(lambda);
+    int i=0;
+    while(i<3){
+        cout <<"Eigenvalue #" << i << ": "<< lambda(i)<<endl;
+        i++;
+    }
+
 }
+
+void jacobiEigTest(arma::mat &A, arma::mat &R, int n){
+
+    //Defining the exact eigenvalues for a chosen matrix
+    double * lambda_exact = new double[n];
+    lambda_exact[0] = 2.0;
+    lambda_exact[1] = 2.0;
+    lambda_exact[2] = 3.0;
+    lambda_exact[3] = 4.0;
+    lambda_exact[4] = 6.0;
+
+    // Defining tolerance
+    double eps = 1.0E-10;
+
+    // fill A with eigenvalues
+    jacobiMethod(A, R, n);
+
+    bool s1=false;
+    bool s2=false;
+    bool s3=false;
+    bool s4=false;
+    bool s5=false;
+
+    //Checking difference between exact and numerical to tolerance
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            s1 = s1 or ( abs( A(i,j) - lambda_exact[0]) < eps);
+            s2 = s2 or ( abs( A(i,j) - lambda_exact[1]) < eps);
+            s3 = s3 or ( abs( A(i,j) - lambda_exact[2]) < eps);
+            s4 = s4 or ( abs( A(i,j) - lambda_exact[3]) < eps);
+            s5 = s5 or ( abs( A(i,j) - lambda_exact[4]) < eps);
+        }
+    }
+
+    // Assertion
+    assert(s1);
+    assert(s2);
+    assert(s3);
+}
+
+arma::mat constructA(int n,int interacting){
+
+    //Step length
+    double rho_0 = 0.0;
+    double rho_n = 5.0;
+    double h = (rho_n-rho_0)/(n+1);
+
+    //Defining the constants in diagonal elements
+    arma::mat A = arma::zeros<arma::mat>(n,n);
+    double d = 2/(h*h);
+    double e = -1/(h*h);
+
+    //This is 0 so not included
+    //int l = 0;
+    //double OrbitalFactor = l*(l+1);
+
+    //Angular freq
+    double Omega_r=0.01;
+
+    //Empty potential
+    int V;
+
+    //Creating the tridiagonal matrix
+    for (int i = 0; i < (n); i++) {
+        double rho = (i+1)*h;
+
+        //Choosing potential
+        if (interacting==1){
+            V=Omega_r*Omega_r*rho*rho + 1/(rho);
+        }else{
+            V=rho*rho;
+        }
+
+        //Setting diagonal elements
+        A(i,i)   = d+ V;
+        if(i<n-1){
+            A(i,i+1) = A(i+1,i) = e;
+        }
+    }
+
+    //Return constructed matrix
+    return A;
+}
+
