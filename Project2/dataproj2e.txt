@@ -2,7 +2,7 @@ Omega_r =            0.01
 rho_min =               0
 rho_max =               5
 Number of steps =             300
-Five lowest eigenvalues:
+Eigenvector corresponding to lowest eigenvalue:
 -0.027772958
 0.078463765
 0.061315116

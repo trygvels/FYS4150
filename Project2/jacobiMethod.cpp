@@ -159,7 +159,7 @@ void jacobiRotation(arma::mat &A, arma::mat &R, int &k, int &l, int n) {
 
 ofstream ofile;
 void output(double rho_max , double rho_min, int n, arma::mat &R, double Omega_r,int lowestvalueindex){
-  ofile.open("../Project2/dataproj2e.txt");
+  ofile.open("dataproj2e.txt");
   ofile <<"Omega_r = " << setw(15) << setprecision(8) << Omega_r << endl;
   ofile <<"rho_min = " << setw(15) << setprecision(8) << rho_min << endl;
   ofile <<"rho_max = " << setw(15) << setprecision(8) << rho_max << endl;
