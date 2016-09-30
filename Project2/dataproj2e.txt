@@ -1,0 +1,10 @@
+RESULTS:
+rho_min =       0.0000000
+rho_max =       5.0000000
+Number of steps =             300
+Five lowest eigenvalues:
+      2.9999138
+      6.9995713
+      10.999145
+      15.003899
+      19.069884

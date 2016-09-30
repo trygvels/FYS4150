@@ -3,8 +3,52 @@
 #include <armadillo>
 #include <vector>
 #include <assert.h>
+#include <iomanip>
+#include <iostream>
 
 using namespace std;
+
+arma::mat constructA(double &rho_min, double &rho_max, int n,int interacting){
+
+    //Step length
+    double h = (rho_max-rho_min)/(n+1);
+
+    //Defining the constants in diagonal elements
+    arma::mat A = arma::zeros<arma::mat>(n,n);
+    double d = 2/(h*h);
+    double e = -1/(h*h);
+
+    //This is 0 so not included
+    //int l = 0;
+    //double OrbitalFactor = l*(l+1);
+
+    //Angular freq
+    double Omega_r=0.01;
+
+    //Empty potential
+    double V;
+
+    //Creating the tridiagonal matrix
+    for (int i = 0; i < (n); i++) {
+        double rho = (i+1)*h;
+
+        //Choosing potential
+        if (interacting==1){
+            V=Omega_r*Omega_r*rho*rho + 1/(rho);
+        }else{
+            V=rho*rho;
+        }
+
+        //Setting diagonal elements
+        A(i,i)   = d + V;
+        if(i<n-1){
+            A(i,i+1) = A(i+1,i) = e;
+        }
+    }
+
+    //Return constructed matrix
+    return A;
+}
 
 double maxOffDiagonals(arma::mat &A, int &k, int &l, int n) {
 
@@ -114,12 +158,36 @@ void jacobiRotation(arma::mat &A, arma::mat &R, int &k, int &l, int n) {
         R(i, k) = c*r_ik - s*r_il;
         R(i, l) = c*r_il + s*r_ik;
     }
+
+}
+
+ofstream ofile;
+void output(double rho_max , double rho_min, int n, arma::vec& d){
+  ofile.open("../Project2/dataproj2e.txt");
+  ofile << "RESULTS:" << endl;
+  ofile << setiosflags(ios::showpoint | ios::uppercase);
+  ofile <<"rho_min = " << setw(15) << setprecision(8) << rho_min << endl;
+  ofile <<"rho_max = " << setw(15) << setprecision(8) << rho_max << endl;
+  ofile <<"Number of steps = " << setw(15) << n << endl;
+  ofile << "Five lowest eigenvalues:" << endl;
+  for(int i = 0; i < 5; i++) {
+    ofile << setw(15) << setprecision(8) << d[i] << endl;
+  }
+  ofile.close();
 }
 
 void jacobiMethod(arma::mat &A, arma::mat &R, int n) {
+    double rho_min = 0.0;
+    double rho_max = 5.0;
+
+    // If it is interacting. interacting=1
+    int interacting = 0;
+
+    // Constructing matrix A
+    A = constructA(rho_min, rho_max,n,interacting);
 
     // Tolerance for the non-diagonals
-    double eps = 1.0e-10;
+    double eps = 1.0e-8;
 
     // Defining maximum number of iterations
     int maxiter=n*n*n;
@@ -145,13 +213,24 @@ void jacobiMethod(arma::mat &A, arma::mat &R, int n) {
     //sorting eigenvalues and printing
     arma::vec lambda = A.diag();
     lambda=sort(lambda);
+
+    //Printing 5 lowest eigenvalues
     int i=0;
     while(i<3){
         cout <<"Eigenvalue #" << i << ": "<< lambda(i)<<endl;
         i++;
     }
+    output(rho_max, rho_min, n, lambda);
 
 }
+
+
+
+/*
+The following functions are tests
+  */
+
+
 
 void jacobiEigTest(arma::mat &A, arma::mat &R, int n){
 
@@ -164,7 +243,7 @@ void jacobiEigTest(arma::mat &A, arma::mat &R, int n){
     lambda_exact[4] = 6.0;
 
     // Defining tolerance
-    double eps = 1.0E-10;
+    double eps = 1.0E-8;
 
     // fill A with eigenvalues
     jacobiMethod(A, R, n);
@@ -190,49 +269,42 @@ void jacobiEigTest(arma::mat &A, arma::mat &R, int n){
     assert(s1);
     assert(s2);
     assert(s3);
+    cout<<"successfully calculated eigenvalues"<<endl;
 }
 
-arma::mat constructA(int n,int interacting){
+void jacobiOrthogTest(arma::mat &A,arma::mat &R,int n){
+    jacobiMethod(A, R, n);
+    double eps=1e-14;
+    arma::mat R_trans = arma::trans(R);
+    arma::mat I; I.eye(n,n);
+    bool s4=false;
+    arma::mat compare = abs(R_trans*R-I);
 
-    //Step length
-    double rho_0 = 0.0;
-    double rho_n = 5.0;
-    double h = (rho_n-rho_0)/(n+1);
-
-    //Defining the constants in diagonal elements
-    arma::mat A = arma::zeros<arma::mat>(n,n);
-    double d = 2/(h*h);
-    double e = -1/(h*h);
-
-    //This is 0 so not included
-    //int l = 0;
-    //double OrbitalFactor = l*(l+1);
-
-    //Angular freq
-    double Omega_r=0.01;
-
-    //Empty potential
-    int V;
-
-    //Creating the tridiagonal matrix
-    for (int i = 0; i < (n); i++) {
-        double rho = (i+1)*h;
-
-        //Choosing potential
-        if (interacting==1){
-            V=Omega_r*Omega_r*rho*rho + 1/(rho);
-        }else{
-            V=rho*rho;
-        }
-
-        //Setting diagonal elements
-        A(i,i)   = d+ V;
-        if(i<n-1){
-            A(i,i+1) = A(i+1,i) = e;
-        }
+    if(arma::all(all(compare<eps,1))){
+            s4=true;
     }
 
-    //Return constructed matrix
-    return A;
+    assert(s4);
+    cout << "Orthogonality conserved"<<endl;
 }
 
+void jacobiMaxoffTest(arma::mat &A,int n){
+    int k=0;
+    int l=0;
+    double max = maxOffDiagonals(A, k, l, n);
+
+    bool s5=false;
+    if(max==1){
+        s5=true;
+    }
+    assert(s5);
+    cout << "Max value found"<<endl;
+}
+
+void tests(arma::mat &A,arma::mat &R,int n){
+    jacobiMaxoffTest(A,n);
+    jacobiEigTest(A, R, n);
+    jacobiOrthogTest(A,R,n);
+    cout << "All tests completed" << endl;
+
+}
