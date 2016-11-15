@@ -1,0 +1,86 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rc
+from scipy import special
+#T (temperature), Cv (specific heat), X (susceptibility) 
+
+c= 12 #Number of cores!
+T,E,Cv,M,X,Mabs = np.loadtxt("data/2allup1e5T1c12.dat",usecols=(0,1,2,3,4,5), unpack=True)
+Ts,Es,Cvs,Ms,Xs,Mabss = np.loadtxt("data/2random1e5T1c12.dat",usecols=(0,1,2,3,4,5), unpack=True)
+# ---------------- New color scheme -----------------
+# These are the "Tableau 20" colors as RGB.    
+tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),    
+             (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),    
+             (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),    
+             (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),    
+             (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]    
+  
+# Scale the RGB values to the [0, 1] range, which is the format matplotlib accepts.    
+for i in range(len(tableau20)):    
+    r, g, b = tableau20[i]    
+    tableau20[i] = (r / 255., g / 255., b / 255.) 
+#-------------------------------------------------------
+
+fig = plt.figure()
+plt.subplot(211)
+plt.plot(range(len(E)), E,color=tableau20[2],label='All up initial')
+plt.plot(range(len(Es)), Es,color=tableau20[4],label='Random initial')
+
+# Sjekk plott. Gaar fra 0 til 3500, 500 av gangen. 
+# Gang med antall kjerner (32 i dette eksempelet).
+#plt.xticks(np.arange(0,len(T),1000),np.arange(0,len(T)*c,1000*c))
+plt.title('Energy and Magnetisation as a function of steps for T=1')
+plt.ylabel('Expected Energy',fontsize=10)
+#--------------------Configuration------------------------------
+# Remove the plot frame lines. They are unnecessary chartjunk.    
+ax = plt.subplot(211)  
+ax.yaxis.grid()  
+ax.spines["top"].set_visible(False)    
+ax.spines["bottom"].set_visible(False)    
+ax.spines["right"].set_visible(False)    
+ax.spines["left"].set_visible(False)   
+plt.xticks(fontsize=10)    
+plt.yticks(fontsize=10)    
+plt.legend()
+plt.xlim(0,100)
+#plt.grid(b=True, which='major')
+#plt.grid(b=True, which='minor', alpha=0.2)
+#plt.minorticks_on()
+# Remove the tick marks; they are unnecessary with the tick lines we just plotted.    
+plt.tick_params(axis="both", which="both", bottom="off", top="off",    
+                labelbottom="on", left="off", right="off", labelleft="on")  
+#-------------------------------------------------------------
+
+plt.subplot(212)
+plt.plot(range(len(M)), M,color=tableau20[2],label='All up initial')
+plt.plot(range(len(Ms)), Ms,color=tableau20[4], label='Random initial')
+
+plt.xlabel("Number of cycles",fontsize=10)
+plt.ylabel('Expected Magnetization',fontsize=10)
+#--------------------Configuration------------------------------
+# Remove the plot frame lines. They are unnecessary chartjunk.    
+ax = plt.subplot(212)   
+ax.yaxis.grid() 
+ax.spines["top"].set_visible(False)    
+ax.spines["bottom"].set_visible(False)    
+ax.spines["right"].set_visible(False)    
+ax.spines["left"].set_visible(False)   
+plt.xticks(fontsize=10)    
+plt.yticks(fontsize=10)   
+#plt.xticks(np.arange(0,len(T),1000),np.arange(0,len(T)*c,1000*c))
+plt.xlim(0,100) 
+#plt.grid(b=True, which='major')
+#plt.grid(b=True, which='minor', alpha=0.2)
+#plt.minorticks_on()
+# Remove the tick marks; they are unnecessary with the tick lines we just plotted.    
+plt.tick_params(axis="both", which="both", bottom="off", top="off",    
+                labelbottom="on", left="off", right="off", labelleft="on")  
+#-------------------------------------------------------------
+
+#-------------------------------------------------------------
+# if you want/need to save the plot in some format, you can use
+# (bbox and pad make the figure to be tighten to the plot-box)
+fig.savefig('EandM_2_T1_bothorient.pdf', bbox_inches='tight',pad_inches=0.106)
+plt.legend()
+plt.show()
+
