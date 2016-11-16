@@ -18,7 +18,6 @@ Ising::Ising(int lattice_dimension, int rank, int world_size) {
     this->world_size = world_size;
 
     this->lattice = (double**) matrix(lattice_dimension, lattice_dimension, sizeof(double));
-    //this->lattice = double[lattice_dimension][lattice_dimension];
 
     double delta_energy[17];
 
@@ -79,8 +78,10 @@ void Ising::simulate(int cycles, double (&expected_values)[5]) {
         expected_values[3] += magnetisation*magnetisation;
         expected_values[4] += fabs(magnetisation);
 
-        if ((i > 0) /*&& (i % 100)*/)  output(i, expected_values);
+        //output(i, expected_values);
     }
+
+    output(no_intervals, expected_values);
 
     // Divide by total number of cycles in order to get expected values
     double normalising_coeff = 1.0 / ((double) cycles);
@@ -145,7 +146,7 @@ void Ising::write_to_terminal() {
     cout << setw(25) << "Specific heat: " << setw(10) << setprecision(8) << specific_heat << endl;
     cout << setw(25) << "Susceptibility: " << setw(10) << setprecision(8) << susceptibility << endl;
     cout << setw(25) << "Expected abs. magnetis.: " << setw(10) << setprecision(8) << exp_abs_magnetisation << endl;
-    cout << setw(25) << "Expected abs. magnetis.: " << setw(10) << setprecision(8) << no_of_accepted_states << endl;
+    cout << setw(25) << "Number of accepted states: " << setw(10) << setprecision(8) << no_of_accepted_states << endl;
 }
 
 
@@ -194,7 +195,8 @@ void Ising::output(int current_cycle, double (&expected_values)[5]) {
         ofile << setw(15) << setprecision(8) << specific_heat;
         ofile << setw(15) << setprecision(8) << expected_magnetisation;
         ofile << setw(15) << setprecision(8) << susceptibility;
-        ofile << setw(15) << setprecision(8) << exp_abs_magnetisation << endl;
+        ofile << setw(15) << setprecision(8) << exp_abs_magnetisation;
+        ofile << setw(15) << setprecision(8) << no_of_accepted_states << endl;
         ofile.close();
     }
 }
