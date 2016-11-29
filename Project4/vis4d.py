@@ -4,16 +4,15 @@ import matplotlib.mlab as mlab
 from matplotlib import rc
 from scipy import special
 c= 60 #Number of cores!
-T,E,Cv,M,X,Mabs,Nacc = np.loadtxt("data/expectations.dat",usecols=(0,1,2,3,4,5,6), unpack=True)
+T,E,Cv,M,X,Mabs,Nacc = np.loadtxt("data/20_1_1_0.05_1e6_c60.dat",usecols=(0,1,2,3,4,5,6), unpack=True)
 Ts,Es,Cvs,Ms,Xs,Mabss,Naccs = np.loadtxt("data/20_24_24_0.05_1e6_c60.dat",usecols=(0,1,2,3,4,5,6), unpack=True)
 #cycles = len(T)
 #time = range(cycles)
 weights = np.ones_like(E[10000:])/len(E[10000:])
 
-sigma = np.mean(Cv)*np.mean(T)**2
 sigmaT1 = np.var(E)
 sigmaT24 = np.var(Es)
-print sigma, sigmaT1, sigmaT24
+print sigmaT1, sigmaT24
 # ---------------- New color scheme -----------------
 # These are the "Tableau 20" colors as RGB.    
 tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),    
@@ -51,8 +50,8 @@ plt.yticks(fontsize=10)
 # Remove the tick marks; they are unnecessary with the tick lines we just plotted.    
 plt.tick_params(axis="both", which="both", bottom="off", top="off",    
                 labelbottom="on", left="off", right="off", labelleft="on")  
-plt.xlim(-2,-1.975)
-plt.ylim(0,0.4)
+plt.xlim(-1.985,-1.90)
+plt.ylim(0,0.7)
 #-------------------------------------------------------------#
 plt.subplot(212)
 
