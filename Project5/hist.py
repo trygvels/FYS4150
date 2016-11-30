@@ -41,7 +41,7 @@ plt.title(r'Money distribution with N = '+str(N)+r' agents with savings',fontsiz
 
 plt.ylabel(r'log($\omega_m$)',fontsize=14)
 plt.xlabel(r'Money m',fontsize=14)
-plt.hist(m1,bins=100, color=tableau20[4])
+plt.hist(m1,bins=50, color=tableau20[4])
 #plt.semilogy(m1,omega, color=tableau20[4]) #Shows straight line; omega is exponential
 
 #fig.savefig('hist5c.pdf', bbox_inches='tight',pad_inches=0.106)
