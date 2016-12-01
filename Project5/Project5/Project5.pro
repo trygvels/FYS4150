@@ -6,4 +6,6 @@ LIBS += -llapack -lblas -larmadillo
 
 SOURCES += main.cpp \
 
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE += -O3
 

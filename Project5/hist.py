@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
-#m1 = np.loadtxt("data/5a_N5e4_trans1e7.dat", unpack=True)
-#m1 = np.loadtxt("build-Project5-Desktop-Debug/mony.dat",unpack=True)
-m1 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony00.dat",unpack=True)
-m2 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony10.dat",unpack=True)
+m1 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony10.dat",unpack=True)
+m2 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony11.dat",unpack=True)
+m3 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony12.dat",unpack=True)
+m4 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony13.dat",unpack=True)
 
 
 # ---------------- New color scheme -----------------
@@ -53,18 +53,26 @@ plt.xlabel(r'Money m',fontsize=14)
 # Use histogram data to graph
 #plt.plot(var[0,:], var[1,:])
 #plt.plot(var[1,:])
+
 data_hist1, binEdges = np.histogram(m1,bins=50)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
-plt.plot(bincenters, data_hist1/float(N), color=tableau20[0],label='a=1 g=0')
+plt.loglog(bincenters, data_hist1/float(N), color=tableau20[0],label='a=1 g=0')
 
 data_hist2, binEdges = np.histogram(m2,bins=50)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
-plt.plot(bincenters, data_hist2/float(N), color=tableau20[2],label='a=1 g=4')
+plt.loglog(bincenters, data_hist2/float(N), color=tableau20[2],label='a=1 g=1')
+
+data_hist2, binEdges = np.histogram(m3,bins=50)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+plt.loglog(bincenters, data_hist2/float(N), color=tableau20[4],label='a=1 g=2')
+data_hist2, binEdges = np.histogram(m4,bins=50)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+plt.loglog(bincenters, data_hist2/float(N), color=tableau20[6],label='a=1 g=3')
 
 plt.legend()
+
 # Simple histogram
 #plt.hist(m1,bins=50, color=tableau20[4])
-
 #Shows straight line; omega is exponential
 #plt.semilogy(m1,omega, color=tableau20[4]) 
 #------------------------------------------------------------

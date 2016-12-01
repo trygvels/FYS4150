@@ -8,6 +8,7 @@ using namespace std;
 
 
 void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, double gamma){
+
     // Array of previous transactions
     arma::mat  cij = arma::zeros<arma::mat>(N,N);
 
@@ -15,7 +16,8 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
     //ofstream varFile;
     //varFile.open("var.dat", ios::out);
 
-    // Arbitrary initial values to break if-test
+    // Arbitrary initial values to break if-test        }
+
     double avgVarBlockOld = 1e100;
     double varVarBlockOld = 1e100;
     // Reset values after each simulation
@@ -48,7 +50,7 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
         /*
         // -2- Pick agent with favored wealth and i=!j
         double random_factor = (double) rand()/RAND_MAX;
-        while ( pow( abs(m_i-m_j), -alpha ) > random_factor && agent_i == agent_j){
+        while ( pow( fabs(m_i-m_j), -alpha ) > random_factor && agent_i == agent_j){
             // Pick new agent
             agent_j = (int) rand() % N;
             m_j = agents(agent_j);
@@ -59,13 +61,13 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
         double random_factor = (double) rand()/RAND_MAX;
         // Number of previous interactions
         int c = cij(agent_i,agent_j)+cij(agent_j,agent_i);
-        while ( (pow( abs(m_i-m_j),-alpha)*pow(c+1,gamma)) < random_factor && agent_i == agent_j){
+        while ( (pow(fabs(m_i-m_j),-alpha)*pow(c+1,gamma) <= random_factor) || (agent_i==agent_j)){
             // Pick new agent
             agent_j = (int) rand() % N;
-            c = cij(agent_i,agent_j)+cij(agent_j,agent_i);
             m_j = agents(agent_j);
+            c = cij(agent_i,agent_j)+cij(agent_j,agent_i);
+            random_factor = (double) rand()/RAND_MAX;
         }
-
         // Value of transaction between 0 and 1
         double epsilon = (double) rand()/RAND_MAX;
 
@@ -78,12 +80,12 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
         double m_i_new = m_i + dm;
         double m_j_new = m_j - dm;
 
-        // Transaction has taken place, let cij know!
-        cij(agent_i,agent_j) += 1;
-
         // Amounts updated
         agents(agent_i) = m_i_new;
         agents(agent_j) = m_j_new;
+
+        // Transaction has taken place, let cij know!
+        cij(agent_i,agent_j) += 1;
 
         // Generalized equilibrium test of variance
         double var = arma::var(agents); // Variance
@@ -117,7 +119,7 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
 
     }
 
-    //varFile.close();
+
 }
 
 void output(int N, arma::vec agents, string filename){
@@ -131,19 +133,26 @@ void output(int N, arma::vec agents, string filename){
 }
 
 
-int main(int argc, char *argv[]){
-    string filename = "mony00.dat"; // output file name
+int main(){
+
+    // Change seed for each simulation
+    srand(2352276);
+
+    string filename = "mony13.dat"; // output file name
     double m0  =    100;    // Initial amount
     int N      =    1000;  // Number of agents
     int trans  =    1e7;    // Number of transactions
-    int sims   =    1;    // Number of simulations
-    double lambda = 0;     // Saving propensity
-    double alpha  = 0;     // Similar wealth factor
-    double gamma  = 0;     // Previous transactions factor
+    int sims   =    1e2;    // Number of simulations
+    double lambda = 0.5;     // Saving propensity
+    double alpha  = 1;     // Similar wealth factor
+    double gamma  = 3;     // Previous transactions factor
     arma::vec agents(N);    // Array of agents
-
     arma::vec totagents(N); // Total wealth of agents for all simulations
+
+    // Begin simulations
     for (int i=0; i<sims;i++){
+
+
 
         // What simulation are we on
         cout << "Simulation " << i << endl;
