@@ -3,37 +3,71 @@
 #include <iomanip>
 #include <armadillo>
 #include <cmath>
-
+#include <math.h>
 using namespace std;
 
 
-void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha){
+void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, double gamma){
+    // Array of previous transactions
+    arma::mat  cij = arma::zeros<arma::mat>(N,N);
 
-    // Arbitrary initial values for equilibrium test
-    double oldvar = 1e10;
-    double oldmean1 = 1e10;
+    // Write variance to file
+    //ofstream varFile;
+    //varFile.open("var.dat", ios::out);
+
+    // Arbitrary initial values to break if-test
+    double avgVarBlockOld = 1e100;
+    double varVarBlockOld = 1e100;
+    // Reset values after each simulation
+    double cumVarBlock  = 0;
+    double cumVar2Block = 0;
+    int blockSize = 1e4;
 
     for (int i = 0; i< trans; i++){
-        // Pick agent with appoximately same
-        int agent_i =
-        int agent_j =
-        double P = abs(m_i-m_j)^(alpha)
 
 
         // Pick two random agents
         int agent_i = (int) rand() % N;
         int agent_j = (int) rand() % N;
 
-        // If same person picked, pick new one
-        while (agent_i == agent_j) agent_j = (int) rand() % N;
 
         // Agents amount
         double m_i = agents(agent_i);
         double m_j = agents(agent_j);
 
+
+        /*
+        // -1- Pick agent with i=!j
+        while (agent_i == agent_j){
+            // Pick new agent
+            agent_j = (int) rand() % N;
+            m_j = agents(agent_j);
+        }
+        */
+
+        /*
+        // -2- Pick agent with favored wealth and i=!j
+        double random_factor = (double) rand()/RAND_MAX;
+        while ( pow( abs(m_i-m_j), -alpha ) > random_factor && agent_i == agent_j){
+            // Pick new agent
+            agent_j = (int) rand() % N;
+            m_j = agents(agent_j);
+        }
+        */
+
+        // -3- Pick agent with favored wealth, previous transactions and i=!j
+        double random_factor = (double) rand()/RAND_MAX;
+        // Number of previous interactions
+        int c = cij(agent_i,agent_j)+cij(agent_j,agent_i);
+        while ( (pow( abs(m_i-m_j),-alpha)*pow(c+1,gamma)) < random_factor && agent_i == agent_j){
+            // Pick new agent
+            agent_j = (int) rand() % N;
+            c = cij(agent_i,agent_j)+cij(agent_j,agent_i);
+            m_j = agents(agent_j);
+        }
+
         // Value of transaction between 0 and 1
         double epsilon = (double) rand()/RAND_MAX;
-
 
         // Transaction without savings
         //double m_i_new = epsilon*(m_i+m_j);
@@ -44,42 +78,51 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha){
         double m_i_new = m_i + dm;
         double m_j_new = m_j - dm;
 
+        // Transaction has taken place, let cij know!
+        cij(agent_i,agent_j) += 1;
+
         // Amounts updated
         agents(agent_i) = m_i_new;
         agents(agent_j) = m_j_new;
 
-        /*
-        // Equilibrium check
-        double mean1 = arma::mean(agents);
-        double mean2 = arma::mean(dot(agents,agents));
-        double var = mean2; - mean1*mean1;
+        // Generalized equilibrium test of variance
+        double var = arma::var(agents); // Variance
+        cumVarBlock += var;
+        cumVar2Block += var*var;
+        if (i % blockSize == 0) {
+            double avgVar  = cumVarBlock  / blockSize;
+            double avgVar2 = cumVar2Block / blockSize;
+            // Variance of a block of variance
+            double varVarBlock = avgVar2 - avgVar*avgVar;
 
-        cout << "var:"<< var << endl;
-        cout << i << endl;
-        // If variance fluxuates less than 1 percent; Equilibrium
-        if (abs(oldvar-var) < 0.0000000001*var){
-            cout << "Variance does not fluxutate; Equalibrium reached" << endl;
-            break;
+            // Check if variance is
+            if ((fabs(avgVarBlockOld - avgVar) / fabs(avgVarBlockOld)      < 0.2) &&
+                (fabs(varVarBlock - varVarBlockOld) / fabs(varVarBlockOld) < 0.5)) {
+                cout << "Transactions reached equilibrium at i = " << i << endl;
+                break;
+            } else {
+                avgVarBlockOld = avgVar;
+                varVarBlockOld = varVarBlock;
+            }
+            // Reset cumulative variance
+            cumVarBlock  = 0;
+            cumVar2Block = 0;
+
         }
 
-        // DOES NOT FLUCTUATE BECAUSE MONEY IS CONSERVED
-        // If mean fluxuates less than 1 percent; Equilibrium
-        if (abs(oldmean1-mean1) < 0.000001*mean1){
-            cout << "Mean does not fluxutate; Equalibrium reached" << endl;
-            break;
+        // Write variance to file
+        if (i % 100 == 0) {
+        //    varFile << i << " " << var << endl;
         }
-
-        oldvar = var;
-        oldmean1 = mean1;
-        */
-
 
     }
+
+    //varFile.close();
 }
 
 void output(int N, arma::vec agents, string filename){
     ofstream ofile;
-    ofile.open(filename, ios::app);
+    ofile.open(filename, ios::out);
     ofile << setiosflags(ios::showpoint | ios::uppercase);
     for (int i = 0; i < N; i++){
         ofile << setw(15) << setprecision(8) << agents(i) << endl;
@@ -89,16 +132,17 @@ void output(int N, arma::vec agents, string filename){
 
 
 int main(int argc, char *argv[]){
-    string filename = "mony.dat"; // output file name
-    double m0  =    1e6;    // Initial amount
-    int N      =    500;  // Number of agents
+    string filename = "mony00.dat"; // output file name
+    double m0  =    100;    // Initial amount
+    int N      =    1000;  // Number of agents
     int trans  =    1e7;    // Number of transactions
     int sims   =    1;    // Number of simulations
     double lambda = 0;     // Saving propensity
-    double alpha  = 0.5;
+    double alpha  = 0;     // Similar wealth factor
+    double gamma  = 0;     // Previous transactions factor
     arma::vec agents(N);    // Array of agents
 
-    arma::vec totagents(N);
+    arma::vec totagents(N); // Total wealth of agents for all simulations
     for (int i=0; i<sims;i++){
 
         // What simulation are we on
@@ -107,22 +151,19 @@ int main(int argc, char *argv[]){
         // Assign equal intial wealth
         agents.fill(m0);
 
-        cout << "m0:"<< m0 << endl;
-
         // Initiate transactions
-        trade(N,trans,agents,lambda, alpha);
+        trade(N,trans,agents,lambda, alpha, gamma);
 
-        // Sum all final amounts
-        totagents += agents;
+
+        // Sort and add equilibrium wealth to total
+        totagents += arma::sort(agents);
+
     }
     // Mean value of all simulations
     agents = totagents/sims;
 
     // Write to file
     output(N, agents,filename);
-
-
-
 
     return 0;
 }

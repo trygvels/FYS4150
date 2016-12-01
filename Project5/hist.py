@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 
 #m1 = np.loadtxt("data/5a_N5e4_trans1e7.dat", unpack=True)
-m1 = np.loadtxt("build-Project5-Desktop-Debug/mony.dat",unpack=True)
+#m1 = np.loadtxt("build-Project5-Desktop-Debug/mony.dat",unpack=True)
+m1 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony00.dat",unpack=True)
+m2 = np.loadtxt("build-Project5-Desktop_Qt_5_7_0_GCC_64bit-Release/mony10.dat",unpack=True)
+
+
 # ---------------- New color scheme -----------------
 # These are the "Tableau 20" colors as RGB.    
 tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),    
@@ -16,6 +20,8 @@ tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
 for i in range(len(tableau20)):    
     r, g, b = tableau20[i]    
     tableau20[i] = (r / 255., g / 255., b / 255.) 
+
+
 #--------------------Configuration------------------------------
 fig = plt.figure()
 # Remove the plot frame lines. They are unnecessary chartjunk.    
@@ -32,6 +38,7 @@ plt.tick_params(axis="both", which="both", bottom="off", top="off",
                 labelbottom="on", left="off", right="off", labelleft="on")
 
 plt.grid(b=True, which='minor', alpha=0.2)
+
 #-------------------------------------------------------------
 N=len(m1)
 beta = 1/np.mean(m1)
@@ -39,10 +46,27 @@ omega = beta*np.exp(beta*m1)
 
 plt.title(r'Money distribution with N = '+str(N)+r' agents with savings',fontsize=12)
 
-plt.ylabel(r'log($\omega_m$)',fontsize=14)
+plt.ylabel(r'Probability',fontsize=14)
 plt.xlabel(r'Money m',fontsize=14)
-plt.hist(m1,bins=50, color=tableau20[4])
-#plt.semilogy(m1,omega, color=tableau20[4]) #Shows straight line; omega is exponential
 
+#---------PLOT---------------------------------------
+# Use histogram data to graph
+#plt.plot(var[0,:], var[1,:])
+#plt.plot(var[1,:])
+data_hist1, binEdges = np.histogram(m1,bins=50)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+plt.plot(bincenters, data_hist1/float(N), color=tableau20[0],label='a=1 g=0')
+
+data_hist2, binEdges = np.histogram(m2,bins=50)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+plt.plot(bincenters, data_hist2/float(N), color=tableau20[2],label='a=1 g=4')
+
+plt.legend()
+# Simple histogram
+#plt.hist(m1,bins=50, color=tableau20[4])
+
+#Shows straight line; omega is exponential
+#plt.semilogy(m1,omega, color=tableau20[4]) 
+#------------------------------------------------------------
 #fig.savefig('hist5c.pdf', bbox_inches='tight',pad_inches=0.106)
 plt.show()
