@@ -44,7 +44,9 @@ void trade(int N, int trans, arma::vec (&agents), double lambda, double alpha, d
         int c = cij(agent_i,agent_j);
         while ( (pow(fabs(m_i-m_j),-alpha)*pow(c+1,gamma) <= random_factor) || (agent_i==agent_j)){
             // Pick new agent
+            agent_i = (int) rand() % N; //Alternative: Pick new both
             agent_j = (int) rand() % N;
+            m_i = agents(agent_i);
             m_j = agents(agent_j);
             c = cij(agent_i,agent_j);
             random_factor = (double) rand()/RAND_MAX;
@@ -123,13 +125,13 @@ int main(){
     // Change seed
     srand(time(NULL));
 
-    string filename = "5d_0.5-1.5-0_s1e3.dat"; // output file name
+    string filename = "alt_0.5-1-0_s1e3.dat"; // output file name
     double m0  =    100;    // Initial amount
     int N      =    1000;  // Number of agents
     int trans  =    1e7;    // Number of transactions
-    int sims   =    1e2;    // Number of simulations
+    int sims   =    1e3;    // Number of simulations
     double lambda = 0.5;     // Saving propensity
-    double alpha  = 1.5;     // Similar wealth factor
+    double alpha  = 1;     // Similar wealth factor
     double gamma  = 0;     // Previous transactions factor
     arma::vec agents(N);    // Array of agents
     arma::vec totagents(N); // Total wealth of agents for all simulations

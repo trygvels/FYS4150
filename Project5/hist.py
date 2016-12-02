@@ -3,14 +3,12 @@ import matplotlib.pyplot as plt
 from scipy.special import gamma
 from matplotlib import rc
 
-m1 = np.loadtxt("data/5d_0-0.5-0_s1e3.dat",unpack=True)
-m2 = np.loadtxt("data/5d_0-1-0_s1e3.dat",unpack=True)
-m3 = np.loadtxt("data/5ab/5a_000_s1e3.dat",unpack=True)
-var = np.loadtxt("data/var.dat",unpack=True)
-"""
-m3 = np.loadtxt("data/5ab/5a_0.5-00_s1e3.dat",unpack=True)
-m4 = np.loadtxt("data/5ab/5a_0.9-00_s1e3.dat",unpack=True)
-"""
+m1 = np.loadtxt("data/5d_0.5-0.5-0_s1e3.dat",unpack=True)
+m2 = np.loadtxt("data/alt_0.5-0.5-0_s1e3.dat",unpack=True)
+m3 = np.loadtxt("data/5d_0.5-1.0-0_s1e3.dat",unpack=True)
+m4 = np.loadtxt("data/alt_0.5-1-0_s1e3.dat",unpack=True)
+
+#var = np.loadtxt("data/var.dat",unpack=True)
 
 # ---------------- New color scheme -----------------
 # These are the "Tableau 20" colors as RGB.    
@@ -70,6 +68,8 @@ binsize = 10
 N1=int(max(m1)/binsize)
 N2=int(max(m2)/binsize)
 N3=int(max(m3)/binsize)
+N4=int(max(m4)/binsize)
+"""
 #N4=int(max(m4)/binsize)
 
 m = np.linspace(min(m3),max(m3),N3)
@@ -79,17 +79,28 @@ x = m*n/np.mean(m3)
 P = x**(n-1)*np.exp(-x)/(gamma(n))
 #plt.loglog(m,m**-2.8,label='Trygve parameteriserer')
 #plt.loglog(x,P, label='P(x)')
-
 """
+
 data_hist1, binEdges = np.histogram(m1,bins=N1)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
-plt.loglog(bincenters, data_hist1/float(N), color=tableau20[0],label=r'$\alpha = 0.5$')
+dbins = bincenters[1]-bincenters[0] #Width of bins
+plt.loglog(bincenters, data_hist1/float(N)*dbins, color=tableau20[0],label=r'$regular$')
 
 data_hist1, binEdges = np.histogram(m2,bins=N2)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
-plt.loglog(bincenters, data_hist1/float(N), color=tableau20[2],label=r'$\alpha = 1.0$')
+dbins = bincenters[1]-bincenters[0] #Width of bins
+plt.loglog(bincenters, data_hist1/float(N)*dbins, color=tableau20[2],label=r'$alternative$')
+data_hist1, binEdges = np.histogram(m3,bins=N3)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+dbins = bincenters[1]-bincenters[0] #Width of bins
+plt.loglog(bincenters, data_hist1/float(N)*dbins, color=tableau20[0],label=r'$regular2$')
 
+data_hist1, binEdges = np.histogram(m4,bins=N4)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+dbins = bincenters[1]-bincenters[0] #Width of bins
+plt.loglog(bincenters, data_hist1/float(N)*dbins, color=tableau20[2],label=r'$alternative2$')
 
+"""
 
 data_hist1, binEdges = np.histogram(m3,bins=N3)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
@@ -97,13 +108,11 @@ bincenters = bincenters * n / 100. #Rescale bincenters
 dbins = bincenters[1]-bincenters[0] #Width of bins
 plt.loglog(bincenters, data_hist1/(float(len(m3))*dbins), color=tableau20[0],label=r'$\alpha = 0$')
 """
-plt.plot(var[0,:], var[1,:])
-plt.legend(loc='upper right')
+#plt.plot(var[0,:], var[1,:])
 #plt.xlim(10,1000)
 #plt.ylim(1e-2,0.2)
 
-
-
+plt.legend(loc='upper right')
 """
 # Simple histogram
 plt.hist(m1,bins=N1, color=tableau20[0],label=r'$\lambda = 0.0$')
