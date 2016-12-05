@@ -3,13 +3,10 @@ import matplotlib.pyplot as plt
 from scipy.special import gamma
 from matplotlib import rc
 
-m1 = np.loadtxt("data/5e/5e_0-1.0-0.0.dat",unpack=True)
-m2 = np.loadtxt("data/5e/5e_0-1.0-1.0.dat",unpack=True)
-m3 = np.loadtxt("data/5e/5e_0-1.0-2.0.dat",unpack=True)
-m4 = np.loadtxt("data/5e/5e_0-1.0-3.0.dat",unpack=True)
-m5 = np.loadtxt("data/5e/5e_0-1.0-4.0.dat",unpack=True)
-
-#var = np.loadtxt("data/var.dat",unpack=True)
+m1 = np.loadtxt("data/5ab/5a_000.dat",unpack=True)
+m2 = np.loadtxt("data/5ab/5a_0.25-00.dat",unpack=True)
+m3 = np.loadtxt("data/5ab/5a_0.5-00.dat",unpack=True)
+m4 = np.loadtxt("data/5ab/5a_0.9-00.dat",unpack=True)
 
 # ---------------- New color scheme -----------------
 # These are the "Tableau 20" colors as RGB.    
@@ -30,7 +27,7 @@ fig = plt.figure()
 # Remove the plot frame lines. They are unnecessary chartjunk.    
 ax = plt.subplot(111)  
 ax.yaxis.grid() 
-ax.xaxis.grid()  
+#ax.xaxis.grid()  
 ax.spines["top"].set_visible(False)    
 ax.spines["bottom"].set_visible(False)    
 ax.spines["right"].set_visible(False)    
@@ -45,22 +42,36 @@ plt.grid(b=True, which='minor', alpha=0.2)
 
 #-------------------------------------------------------------
 N=len(m1)
+beta = 1/np.mean(m1)
+omega1 = beta*np.exp(-beta*m1)
+#plt.plot(m1,omega1,  color=tableau20[0],label=r'$\lambda = 0.0$')
+"""
+binsize = 20
+N1=int(max(m1)/binsize)
+data_hist1, binEdges = np.histogram(m1,bins=N1)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+#bincenters = bincenters * n / 100. #Rescale bincenters
+dbins = bincenters[1]-bincenters[0] #Width of bins
+#plt.plot(bincenters, data_hist1/(float(N)), color=tableau20[2],label=r'$ \gamma = 0.0$')
+
+plt.plot(m1[:33], (data_hist1[:33]/(float(N)))/omega1[:33])
 """
 #SHOW GIBBS DISTRIBUTION??
-beta = 1/np.mean(m1)
 print np.mean(m1)
-omega1 = beta*np.exp(beta*m1)
-omega2 = beta*np.exp(beta*m2)
-omega3 = beta*np.exp(beta*m3)
-omega4 = beta*np.exp(beta*m4)
+beta = 1/np.mean(m1)
+omega1 = beta*np.exp(-beta*m1)
+omega2 = beta*np.exp(-beta*m2)
+omega3 = beta*np.exp(-beta*m3)
+omega4 = beta*np.exp(-beta*m4)
+
 plt.semilogy(m1,omega1,  color=tableau20[0],label=r'$\lambda = 0.0$')
 plt.semilogy(m2,omega2,  color=tableau20[2],label=r'$\lambda = 0.25$')
 plt.semilogy(m3,omega3,  color=tableau20[4],label=r'$\lambda = 0.5$')
 plt.semilogy(m4,omega4,  color=tableau20[6],label=r'$\lambda = 0.9$')
-plt.legend(loc="center right")
-"""
-plt.title(r'Wealth distribution -  N = '+str(N)+r' $\lambda = 0.0, \alpha = 1.0$',fontsize=12)
-plt.ylabel(r'Percent of total agents',fontsize=14)
+plt.legend(loc="center right",fancybox=True, framealpha=0.2)
+plt.title(r'log($\omega_m$) versus m',fontsize=12)
+#plt.title(r'Wealth distribution -  N = '+str(N)+r' $\lambda = 0.0, \alpha = 1.0$',fontsize=12)
+plt.ylabel(r'log($\omega_m$)',fontsize=14)
 plt.xlabel(r'wealth m ($m_0 = 100$)',fontsize=14)
 
 #---------PLOT---------------------------------------
@@ -71,7 +82,6 @@ N1=int(max(m1)/binsize)
 N2=int(max(m2)/binsize)
 N3=int(max(m3)/binsize)
 N4=int(max(m4)/binsize)
-N5=int(max(m5)/binsize)
 #--------------------------PARAMETERIZATION--------------------
 """
 beta = 1/np.mean(m1)
@@ -87,7 +97,7 @@ plt.loglog(m,m**-2.8,label=r'Pareto $\alpha = 1.8$',color=tableau20[2])
 plt.loglog(x,P,color=tableau20[0], label='$\lambda = 0$ P(x)')
 """
 #--------------------------PLOTS--------------------
-
+"""
 data_hist1, binEdges = np.histogram(m1,bins=N1)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
 #bincenters = bincenters * n / 100. #Rescale bincenters
@@ -122,11 +132,11 @@ dbins = bincenters[1]-bincenters[0] #Width of bins
 plt.plot(bincenters, data_hist1/(float(N)), color=tableau20[8],label=r'$ \gamma = 4.0$')
 
 
-
+"""
 #plt.plot(var[0,:], var[1,:])
-plt.xlim(10,1000)
+#plt.xlim(10,1000)
 #plt.ylim(1e-3,1e-1)
-plt.legend(loc='upper right',fancybox=True, framealpha=0.2)
+#plt.legend(loc='upper right',fancybox=True, framealpha=0.2)
 #------------ Simple histogram
 """
 plt.hist(m1,bins=N1, color=tableau20[0],label=r'$\lambda = 0.0$')
@@ -136,5 +146,5 @@ plt.hist(m4, bins=N4,color=tableau20[6],label=r'$\lambda = 0.25$')
 plt.legend()
 """
 #------------------------------------------------------------
-fig.savefig('5e_0-1.0-var.pdf', bbox_inches='tight',pad_inches=0.106)
+fig.savefig('omega.pdf', bbox_inches='tight',pad_inches=0.106)
 plt.show()
