@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 from scipy.special import gamma
 from matplotlib import rc
 
-m1 = np.loadtxt("data/5d/5d_0.0-0.5-0.0.dat",unpack=True)
-m2 = np.loadtxt("data/5d/5d_0.0-1.0-0.0.dat",unpack=True)
-m3 = np.loadtxt("data/5d/5d_0.0-1.5-0.0.dat",unpack=True)
-m4 = np.loadtxt("data/5d/5d_0.0-2.0-0.0.dat",unpack=True)
+m1 = np.loadtxt("data/5e/5e_0.5-2.0-1.0.dat",unpack=True)
+m2 = np.loadtxt("data/5e/5e_0-2.0-1.0.dat",unpack=True)
+m3 = np.loadtxt("data/5e/5e_0-2.0-2.0.dat",unpack=True)
+m4 = np.loadtxt("data/5e/5e_0-2.0-3.0.dat",unpack=True)
 
 #var = np.loadtxt("data/var.dat",unpack=True)
 
@@ -58,7 +58,7 @@ plt.semilogy(m3,omega3,  color=tableau20[4],label=r'$\lambda = 0.5$')
 plt.semilogy(m4,omega4,  color=tableau20[6],label=r'$\lambda = 0.9$')
 plt.legend(loc="center right")
 """
-plt.title(r'Wealth distribution -  N = '+str(N)+r' $\lambda = 0.0, \gamma = 0.0$',fontsize=12)
+plt.title(r'Wealth distribution -  N = '+str(N)+r' $\alpha = 2.0$ with Power law tail',fontsize=12)
 plt.ylabel(r'Percent of total agents',fontsize=14)
 plt.xlabel(r'wealth m ($m_0 = 100$)',fontsize=14)
 
@@ -85,37 +85,45 @@ plt.loglog(m,m**-2.8,label=r'Pareto $\alpha = 1.8$',color=tableau20[2])
 plt.loglog(x,P,color=tableau20[0], label='$\lambda = 0$ P(x)')
 """
 #--------------------------PLOTS--------------------
+
+m = np.linspace(min(m1),max(m1),N1)
 data_hist1, binEdges = np.histogram(m1,bins=N1)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
 #bincenters = bincenters * n / 100. #Rescale bincenters
 dbins = bincenters[1]-bincenters[0] #Width of bins
-plt.loglog(bincenters, data_hist1/(float(N)*dbins), color=tableau20[0],label=r'$ \alpha = 0.5$')
+plt.loglog(m,5000000000*m**(-1.0-2.0-1.-.5),label=r'$\gamma = 0.1$ $\lambda = 0.5$ Power law ',color=tableau20[1])
+plt.loglog(bincenters, data_hist1/(float(N)), color=tableau20[0],label=r'$ \gamma = 0.1$$\lambda = 0.5$')
 
+m = np.linspace(min(m2),max(m2),N2)
 data_hist1, binEdges = np.histogram(m2,bins=N2)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
 #bincenters = bincenters * n / 100. #Rescale bincenters
+plt.loglog(m,300000000*m**(-1.0-2.0-1.),label=r'$\gamma = 1.0$ $\lambda = 0.0$ Power law ',color=tableau20[3])
 dbins = bincenters[1]-bincenters[0] #Width of bins
-plt.loglog(bincenters, data_hist1/(float(N)*dbins), color=tableau20[2],label=r'$ \alpha = 1.0$')
-
-
+plt.loglog(bincenters, data_hist1/(float(N)), color=tableau20[2],label=r'$ \gamma = 1.0$ $\lambda = 0.0$')
+"""
+m = np.linspace(min(m3),max(m3),N3)
 data_hist1, binEdges = np.histogram(m3,bins=N3)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
+plt.plot(m,12500*m**(-1.0-1.5),label=r'$\alpha = 1.5$ Power law ',color=tableau20[5])
 #bincenters = bincenters * n / 100. #Rescale bincenters
 dbins = bincenters[1]-bincenters[0] #Width of bins
-plt.loglog(bincenters, data_hist1/(float(N)*dbins), color=tableau20[4],label=r'$ \alpha = 1.5$')
+plt.plot(bincenters, data_hist1/(float(N)), color=tableau20[4],label=r'$ \alpha = 1.5$')
 
+m = np.linspace(min(m4),max(m4),N4)
 data_hist1, binEdges = np.histogram(m4,bins=N4)
 bincenters = 0.5*(binEdges[1:]+binEdges[:-1]) #Center bin data
 #bincenters = bincenters * n / 100. #Rescale bincenters
+plt.plot(m,300000*m**(-1.0-2.0),label=r'$\alpha = 2.0$ Power law ',color=tableau20[7])
 dbins = bincenters[1]-bincenters[0] #Width of bins
-plt.loglog(bincenters, data_hist1/(float(N)*dbins), color=tableau20[6],label=r'$ \alpha = 2.0$')
-
+plt.plot(bincenters, data_hist1/(float(N)), color=tableau20[6],label=r'$ \alpha = 2.0$')
+"""
 
 
 #plt.plot(var[0,:], var[1,:])
-plt.xlim(1e1,1e3)
-#plt.ylim(1e-2,1e0)
-plt.legend(loc='upper right')
+plt.xlim(100,1000)
+plt.ylim(1e-3,1e-1)
+plt.legend(loc='lower left',fancybox=True, framealpha=0.2)
 #------------ Simple histogram
 """
 plt.hist(m1,bins=N1, color=tableau20[0],label=r'$\lambda = 0.0$')
@@ -125,5 +133,5 @@ plt.hist(m4, bins=N4,color=tableau20[6],label=r'$\lambda = 0.25$')
 plt.legend()
 """
 #------------------------------------------------------------
-fig.savefig('5d_0-var-0.pdf', bbox_inches='tight',pad_inches=0.106)
+fig.savefig('5e_var-2-var-POWERlog.pdf', bbox_inches='tight',pad_inches=0.106)
 plt.show()
